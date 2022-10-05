@@ -2,17 +2,16 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: webserver-vs
+  name: myapp-vs
   namespace: myapp
 spec:
   hosts:
   - hi.aksa.com.pk
   gateways:
-  - malik-gateway
+  - myapp-gateway
   http:
   - route:
     - destination:
-#        host: webserver.default.svc.cluster.local
-        host: webserver.myapp.svc.cluster.local
+        host: webserver
         port:
           number: 80
