@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: servicetwo
+  annotations:
+    kubernetes.io/change-cause: "ServiceTwo Deployment"
+  name: servicetwo
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: servicetwo
+  template:
+    metadata:
+      labels:
+        app: servicetwo
+    spec:
+      containers:
+      - image: 10.0.0.4:8085/zong-01/svc2:v5.0.0.2-64-77bb4d1
+        name: stwo
+       # imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5002
+        volumeMounts:
+        - name: tz-config
+          mountPath: /etc/localtime
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Karachi
+#      imagePullSecrets:
+#        - name: myregkey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: servicetwo
+  labels:
+    app: servicetwo
+spec:
+  selector:
+    app: servicetwo
+  type: NodePort
+  ports:
+  - name: servicetwo
+    port: 80
+    protocol: TCP
+    targetPort: 5002
+    nodePort: 30072
