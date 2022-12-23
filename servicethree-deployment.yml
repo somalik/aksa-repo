@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: servicethree
+  annotations:
+    kubernetes.io/change-cause: "ServiceThree Deployment"
+  name: servicethree
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: servicethree
+  template:
+    metadata:
+      labels:
+        app: servicethree
+    spec:
+      containers:
+      - image: 10.0.0.4:8085/zong-01/svc3:v5.0.0.2-64-77bb4d1
+        name: sthree
+       # imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5003
+        volumeMounts:
+        - name: tz-config
+          mountPath: /etc/localtime
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Karachi
+#      imagePullSecrets:
+#        - name: myregkey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: servicethree
+  labels:
+    app: servicethree
+spec:
+  selector:
+    app: servicethree
+  type: NodePort
+  ports:
+  - name: servicethree
+    port: 80
+    protocol: TCP
+    targetPort: 5003
+    nodePort: 30073
