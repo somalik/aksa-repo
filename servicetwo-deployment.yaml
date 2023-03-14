@@ -37,8 +37,8 @@ spec:
         - name: tz-config
           hostPath:
             path: /usr/share/zoneinfo/Asia/Karachi
-#      imagePullSecrets:
-#        - name: myregkey
+      imagePullSecrets:
+        - name: myregkey
 ---
 apiVersion: v1
 kind: Service
